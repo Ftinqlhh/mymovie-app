@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyMovie - Movie Details</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">MY<span>MOVIE</span></div>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="watchlist.html">Watchlist</a>
+            <a href="analytics.html">Analytics</a>
+        </nav>
+
+        <div class="nav-label">Your Movie Planner</div>
+    </header>
+
+    <main class="details-main">
+
+        <div id="detailsLoading" class="details-message">
+            Loading movie details...
+        </div>
+
+        <section id="detailsContent" hidden>
+
+            <div id="detailsHero" class="details-hero">
+                <div class="details-hero-content">
+                    <span class="hero-tag">MOVIE DETAILS</span>
+
+                    <h1 id="detailsTitle">Movie Title</h1>
+
+                    <div id="detailsMeta" class="details-meta"></div>
+
+                    <p id="detailsOverview"></p>
+
+                    <div class="details-actions">
+                        <button id="detailsAddBtn">
+                            + Add to Watchlist
+                        </button>
+
+                        <button id="detailsBackBtn" type="button">
+                            Back to Discover
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-information">
+
+                <div class="details-poster-container">
+                    <img id="detailsPoster" alt="Movie poster">
+                </div>
+
+                <div class="details-info-panel">
+                    <h2>About This Movie</h2>
+
+                    <p><strong>Director:</strong>
+                        <span id="detailsDirector">N/A</span>
+                    </p>
+
+                    <p><strong>Genres:</strong>
+                        <span id="detailsGenres">N/A</span>
+                    </p>
+
+                    <p><strong>Release Date:</strong>
+                        <span id="detailsRelease">N/A</span>
+                    </p>
+
+                    <p><strong>Runtime:</strong>
+                        <span id="detailsRuntime">N/A</span>
+                    </p>
+
+                    <p><strong>Rating:</strong>
+                        <span id="detailsRating">N/A</span>
+                    </p>
+
+                    <h2>Top Cast</h2>
+                    <div id="detailsCast" class="details-cast"></div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 MyMovie | Your Personal Movie Planner</p>
+    </footer>
+
+    <script src="details.js"></script>
+</body>
+</html>

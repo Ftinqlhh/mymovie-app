@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>MyMovie - Discover Movies</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <header class="navbar">
+        <div class="logo">MY<span>MOVIE</span></div>
+
+        <nav>
+            <a href="index.html" class="active">Home</a>
+            <a href="watchlist.html">Watchlist</a>
+            <a href="analytics.html">Analytics</a>
+        </nav>
+
+        <div class="nav-label">Your Movie Planner</div>
+    </header>
+
+    <!-- HERO BANNER -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-tag">WELCOME TO MYMOVIE</span>
+
+            <h1>
+                Your Next Favourite
+                <span>Movie Awaits.</span>
+            </h1>
+
+            <p>
+                Discover amazing movies, explore different
+                genres, and build your personal watchlist.
+            </p>
+
+            <a href="#discover" class="hero-button">
+                Explore Movies
+            </a>
+        </div>
+    </section>
+
+    <main id="discover">
+
+        <!-- MOVIE SEARCH -->
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>Discover Movies</h2>
+                <p>Search for movies you love.</p>
+            </div>
+
+            <div class="search-container">
+                <input
+                    type="text"
+                    id="searchMovie"
+                    placeholder="Search movie title..."
+                >
+
+                <button id="searchBtn">
+                    Search
+                </button>
+            </div>
+        </section>
+
+        <!-- GENRE FILTER -->
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>Explore by Genre</h2>
+                <p>Find movies that match your mood.</p>
+            </div>
+
+            <div class="filter-container">
+                <select id="genreSelect">
+                    <option value="">All Genres</option>
+                    <option value="28">Action</option>
+                    <option value="35">Comedy</option>
+                    <option value="18">Drama</option>
+                    <option value="27">Horror</option>
+                    <option value="10749">Romance</option>
+                    <option value="878">Science Fiction</option>
+                    <option value="16">Animation</option>
+                </select>
+
+                <button id="recommendBtn">
+                    Recommend Movies
+                </button>
+            </div>
+        </section>
+
+        <!-- MOVIE RESULTS -->
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>Movies For You</h2>
+                <p>Explore and save movies to your watchlist.</p>
+            </div>
+
+            <div id="movieResults" class="movie-grid">
+                <p class="empty-message">
+                    Search or select a genre to discover movies.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 MyMovie | Your Personal Movie Planner</p>
+    </footer>
+    <script src="renderer.js"></script>
+</body>
+</html>

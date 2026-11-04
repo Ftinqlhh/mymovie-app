@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyMovie - My Watchlist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">MY<span>MOVIE</span></div>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="watchlist.html" class="active">My Watchlist</a>
+            <a href="analytics.html">Analytics</a>
+        </nav>
+
+        <div class="nav-label">Your Movie Planner</div>
+    </header>
+
+
+    <main class="watchlist-main">
+        <section class="watchlist-panel">
+            <h2>My Watchlist</h2>
+            <p>Manage your favourite movies.</p>
+
+            <form id="movieForm">
+
+                <label for="movieTitle">Movie Title:</label>
+                <input
+                    type="text"
+                    id="movieTitle"
+                    required
+                >
+
+                <label for="movieGenre">Genre:</label>
+                <select id="movieGenre" required>
+                    <option value="">Select Genre</option>
+                    <option value="Action">Action</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Science Fiction">Science Fiction</option>
+                    <option value="Animation">Animation</option>
+                </select>
+
+                <label for="movieRuntime">
+                    Runtime (minutes):
+                </label>
+                <input
+                    type="number"
+                    id="movieRuntime"
+                    min="1"
+                    required
+                >
+
+                <label for="movieStatus">Status:</label>
+                <select id="movieStatus">
+                    <option value="Plan to Watch">
+                        Plan to Watch
+                    </option>
+                    <option value="Watched">
+                        Watched
+                    </option>
+                </select>
+
+                <button type="submit" id="saveMovieBtn">
+                    Save Movie
+                </button>
+
+            </form>
+        </section>
+
+        <section class="watchlist-panel">
+            <h2>Saved Movies</h2>
+
+            <div id="watchlistContainer">
+                <p>No movies saved yet.</p>
+            </div>
+        </section>
+
+        <section class="watchlist-panel">
+            <h2>Watchlist Statistics</h2>
+
+            <p>
+                Total Movies:
+                <span id="totalMovies">0</span>
+            </p>
+
+            <p>
+                Total Watch Time:
+                <span id="totalWatchTime">0 hours</span>
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>MyMovie Desktop Application</p>
+    </footer>
+    <script src="watchlist.js"></script>
+
+</body>
+</html>
