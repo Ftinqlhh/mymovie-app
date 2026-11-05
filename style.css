@@ -214,6 +214,14 @@ a:focus-visible {
     outline-offset: 3px;
 }
 
+/*CLEAR SEARCH BUTTON*/
+#clearBtn{
+    background-color: red;
+    color: white;
+}
+#clearBtn:hover{
+    background-color:#FF6347;
+}
 /* MOVIE CARDS */
 
 .movie-grid,
