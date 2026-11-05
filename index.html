@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>MyMovie - Discover Movies</title>
     <link rel="stylesheet" href="style.css">
@@ -12,20 +11,19 @@
 
 <body>
 
-    <!-- NAVIGATION BAR -->
+    <!-- Navigation bar -->
     <header class="navbar">
         <div class="logo">MY<span>MOVIE</span></div>
 
         <nav>
             <a href="index.html" class="active">Home</a>
             <a href="watchlist.html">Watchlist</a>
-            <a href="analytics.html">Analytics</a>
         </nav>
 
         <div class="nav-label">Your Movie Planner</div>
     </header>
 
-    <!-- HERO BANNER -->
+    <!-- Welcome banner -->
     <section class="hero">
         <div class="hero-content">
             <span class="hero-tag">WELCOME TO MYMOVIE</span>
@@ -48,7 +46,7 @@
 
     <main id="discover">
 
-        <!-- MOVIE SEARCH -->
+        <!-- Search movies -->
         <section class="content-section">
             <div class="section-heading">
                 <h2>Discover Movies</h2>
@@ -62,13 +60,11 @@
                     placeholder="Search movie title..."
                 >
 
-                <button id="searchBtn">
-                    Search
-                </button>
+                <button id="searchBtn">Search</button>
             </div>
         </section>
 
-        <!-- GENRE FILTER -->
+        <!-- Movie recommendations -->
         <section class="content-section">
             <div class="section-heading">
                 <h2>Explore by Genre</h2>
@@ -93,7 +89,7 @@
             </div>
         </section>
 
-        <!-- MOVIE RESULTS -->
+        <!-- Display movie results -->
         <section class="content-section">
             <div class="section-heading">
                 <h2>Movies For You</h2>
@@ -102,16 +98,20 @@
 
             <div id="movieResults" class="movie-grid">
                 <p class="empty-message">
-                    Search or select a genre to discover movies.
+                    Loading movies for you...
                 </p>
             </div>
         </section>
 
     </main>
 
+    <!-- Footer -->
     <footer>
         <p>© 2026 MyMovie | Your Personal Movie Planner</p>
     </footer>
+
+    <!-- JavaScript for Discover page -->
     <script src="renderer.js"></script>
+
 </body>
 </html>

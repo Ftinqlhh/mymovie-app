@@ -1,15 +1,18 @@
+
 require('dotenv').config();
 
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
-// Create the Electron application window
+
+// Create the main application window
 function createWindow() {
     const mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
         minWidth: 900,
         minHeight: 600,
+
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
@@ -20,199 +23,207 @@ function createWindow() {
     mainWindow.loadFile('index.html');
 }
 
-// Start Electron when ready
-app.whenReady().then(() => {
 
-    // ======================================
-    // 1. SEARCH MOVIES USING TMDB API
-    // ======================================
-    ipcMain.handle('tmdb:search', async (event, title) => {
-        const token = process.env.TMDB_TOKEN;
+// Get TMDB token from .env file
+function getToken() {
+    const token = process.env.TMDB_TOKEN;
 
-        if (!token) {
-            throw new Error('TMDB token is missing.');
+    if (!token) {
+        throw new Error('TMDB token is missing.');
+    }
+
+    return token;
+}
+
+
+// Request movie data from TMDB
+async function getTMDBData(url) {
+    const token = getToken();
+
+    const response = await fetch(url, {
+        headers: {
+            Authorization: 'Bearer ' + token,
+            accept: 'application/json'
         }
-
-        if (typeof title !== 'string' || !title.trim()) {
-            throw new Error('Please enter a movie title.');
-        }
-
-        const url = new URL(
-            'https://api.themoviedb.org/3/search/movie'
-        );
-
-        url.searchParams.set('query', title.trim());
-        url.searchParams.set('language', 'en-US');
-
-        const response = await fetch(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                accept: 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(
-                `TMDB search failed: ${response.status}`
-            );
-        }
-
-        const data = await response.json();
-
-        return data.results || [];
     });
 
-    // ======================================
-    // 2. DISCOVER MOVIES BY GENRE
-    // ======================================
-    ipcMain.handle('tmdb:discover', async (event, genreId) => {
-        const token = process.env.TMDB_TOKEN;
+    if (!response.ok) {
+        throw new Error('TMDB request failed: ' + response.status);
+    }
 
-        if (!token) {
-            throw new Error('TMDB token is missing.');
-        }
+    const data = await response.json();
+    return data;
+}
 
-        const allowedGenres = [
-            '28', '35', '18', '27',
-            '10749', '878', '16'
-        ];
 
-        if (genreId && !allowedGenres.includes(genreId)) {
-            throw new Error('Invalid movie genre.');
-        }
+// Search movies by title
+async function searchMovies(event, title) {
 
-        const url = new URL(
-            'https://api.themoviedb.org/3/discover/movie'
-        );
+    // Check movie title
+    if (typeof title !== 'string' || title.trim() === '') {
+        throw new Error('Please enter a movie title.');
+    }
 
-        url.searchParams.set('language', 'en-US');
-        url.searchParams.set('sort_by', 'popularity.desc');
+    // Prepare TMDB search URL
+    const url = new URL('https://api.themoviedb.org/3/search/movie');
 
-        if (genreId) {
-            url.searchParams.set('with_genres', genreId);
-        }
+    url.searchParams.set('query', title.trim());
+    url.searchParams.set('language', 'en-US');
 
-        const response = await fetch(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                accept: 'application/json'
+    // Get search results
+    const data = await getTMDBData(url);
+
+    return data.results || [];
+}
+
+
+// Discover movies based on genre
+async function discoverMovies(event, genreId) {
+
+    // List of available genres
+    const allowedGenres = [
+        '28',     // Action
+        '35',     // Comedy
+        '18',     // Drama
+        '27',     // Horror
+        '10749',  // Romance
+        '878',    // Science Fiction
+        '16'      // Animation
+    ];
+
+    // Check selected genre
+    if (genreId && !allowedGenres.includes(genreId)) {
+        throw new Error('Invalid movie genre.');
+    }
+
+    // Prepare TMDB discover URL
+    const url = new URL('https://api.themoviedb.org/3/discover/movie');
+
+    url.searchParams.set('language', 'en-US');
+    url.searchParams.set('sort_by', 'popularity.desc');
+
+    if (genreId) {
+        url.searchParams.set('with_genres', genreId);
+    }
+
+    // Get discovered movies
+    const data = await getTMDBData(url);
+
+    return data.results || [];
+}
+
+// Get movie runtime and genre
+async function getMovieDetails(event, movieId) {
+
+    // Check movie ID
+    if (!Number.isSafeInteger(movieId) || movieId <= 0) {
+        throw new Error('Invalid movie ID.');
+    }
+
+    // Prepare movie details URL
+    const url = new URL(
+        'https://api.themoviedb.org/3/movie/' + movieId
+    );
+
+    url.searchParams.set('language', 'en-US');
+
+    // Get movie information
+    const data = await getTMDBData(url);
+
+    // Get first genre
+    let genre = '';
+
+    if (data.genres && data.genres.length > 0) {
+        genre = data.genres[0].name;
+    }
+
+    return {
+        runtime: data.runtime,
+        genre: genre
+    };
+}
+
+// Get full movie information
+async function getFullMovieDetails(event, movieId) {
+
+    // Check movie ID
+    if (!Number.isSafeInteger(movieId) || movieId <= 0) {
+        throw new Error('Invalid movie ID.');
+    }
+
+    // Prepare full details URL
+    const url = new URL(
+        'https://api.themoviedb.org/3/movie/' + movieId
+    );
+
+    url.searchParams.set('language', 'en-US');
+    url.searchParams.set('append_to_response', 'credits');
+
+    // Get full movie information
+    const data = await getTMDBData(url);
+
+    // Find the movie director
+    let directorName = 'N/A';
+
+    if (data.credits && data.credits.crew) {
+        for (let person of data.credits.crew) {
+            if (person.job === 'Director') {
+                directorName = person.name;
+                break;
             }
-        });
-
-        if (!response.ok) {
-            throw new Error(
-                `TMDB discover failed: ${response.status}`
-            );
         }
+    }
 
-        const data = await response.json();
+    // Get a maximum of 8 cast members
+    const cast = [];
 
-        return data.results || [];
-    });
+    if (data.credits && data.credits.cast) {
+        for (let person of data.credits.cast) {
 
-    // ======================================
-    // 3. GET MOVIE DETAILS AND RUNTIME
-    // ======================================
-    ipcMain.handle('tmdb:details', async (event, movieId) => {
-        const token = process.env.TMDB_TOKEN;
-
-        if (!token) {
-            throw new Error('TMDB token is missing.');
-        }
-
-        if (!Number.isSafeInteger(movieId) || movieId <= 0) {
-            throw new Error('Invalid movie ID.');
-        }
-
-        const url = new URL(
-            `https://api.themoviedb.org/3/movie/${movieId}`
-        );
-
-        url.searchParams.set('language', 'en-US');
-
-        const response = await fetch(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                accept: 'application/json'
+            if (cast.length >= 6) {
+                break;
             }
-        });
 
-        if (!response.ok) {
-            throw new Error(
-                `TMDB details failed: ${response.status}`
-            );
+            const castMember = {
+                name: person.name,
+                character: person.character,
+                profile_path: person.profile_path
+            };
+
+            cast.push(castMember);
         }
+    }
 
-        const data = await response.json();
+    // Return movie information to renderer
+    return {
+        id: data.id,
+        title: data.title,
+        overview: data.overview,
+        poster_path: data.poster_path,
+        backdrop_path: data.backdrop_path,
+        release_date: data.release_date,
+        vote_average: data.vote_average,
+        runtime: data.runtime,
+        genres: data.genres || [],
+        director: directorName,
+        cast: cast
+    };
+}
 
-        return {
-            runtime: data.runtime,
-            genre: data.genres?.[0]?.name || ''
-        };
-    });
-    
-    ipcMain.handle('tmdb:fullDetails', async (event, movieId) => {
-        const token = process.env.TMDB_TOKEN;
+// Start Electron application
+app.whenReady().then(function () {
 
-        if (!token) {
-            throw new Error('TMDB token is missing.');
-        }
+    // Connect renderer requests to TMDB functions
+    ipcMain.handle('tmdb:search', searchMovies);
+    ipcMain.handle('tmdb:discover', discoverMovies);
+    ipcMain.handle('tmdb:details', getMovieDetails);
+    ipcMain.handle('tmdb:fullDetails', getFullMovieDetails);
 
-        if (!Number.isSafeInteger(movieId) || movieId <= 0) {
-            throw new Error('Invalid movie ID.');
-        }
-
-        const url = new URL(
-            `https://api.themoviedb.org/3/movie/${movieId}`
-        );
-
-        url.searchParams.set('language', 'en-US');
-        url.searchParams.set('append_to_response', 'credits');
-
-        const response = await fetch(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                accept: 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(
-                `TMDB full details failed: ${response.status}`
-            );
-        }
-
-        const data = await response.json();
-
-        const director = (data.credits?.crew || [])
-            .find(person => person.job === 'Director');
-
-        return {
-            id: data.id,
-            title: data.title,
-            overview: data.overview,
-            poster_path: data.poster_path,
-            backdrop_path: data.backdrop_path,
-            release_date: data.release_date,
-            vote_average: data.vote_average,
-            runtime: data.runtime,
-            genres: data.genres || [],
-            director: director?.name || 'N/A',
-            cast: (data.credits?.cast || []).slice(0, 6)
-                .map(person => ({
-                    name: person.name,
-                    character: person.character,
-                    profile_path: person.profile_path
-                }))
-        };
-    });
-
-
-    // Open the application
+    // Open main window
     createWindow();
 
     // Reopen window on macOS
-    app.on('activate', () => {
+    app.on('activate', function () {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
@@ -220,7 +231,7 @@ app.whenReady().then(() => {
 });
 
 // Close application when all windows are closed
-app.on('window-all-closed', () => {
+app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
         app.quit();
     }

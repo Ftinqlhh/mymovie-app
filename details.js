@@ -1,29 +1,24 @@
 
 const params = new URLSearchParams(window.location.search);
 const movieId = Number(params.get('id'));
-
-const loadingMessage =
-    document.getElementById('detailsLoading');
-
-const detailsContent =
-    document.getElementById('detailsContent');
+const loadingMessage = document.getElementById('detailsLoading');
+const detailsContent = document.getElementById('detailsContent');
 
 let currentMovie = null;
 
-// Load full movie details
+// LOAD MOVIE INFORMATION FROM TMDB
 async function loadMovieDetails() {
+
+    // Check if movie ID is valid
     if (!Number.isSafeInteger(movieId) || movieId <= 0) {
-        loadingMessage.textContent =
-            'Invalid movie ID. Please return to Discover.';
+        loadingMessage.textContent = 'Invalid movie ID. Please return to Discover.';
         return;
     }
-
     try {
-        const movie =
-            await window.movieAPI.getFullMovieDetails(movieId);
-
+        // Get full movie details
+        const movie = await window.movieAPI.getFullMovieDetails(movieId);
         currentMovie = movie;
-
+        // Display movie title and synopsis
         document.getElementById('detailsTitle').textContent =
             movie.title || 'Unknown Title';
 
@@ -33,90 +28,132 @@ async function loadMovieDetails() {
         document.getElementById('detailsDirector').textContent =
             movie.director || 'N/A';
 
-        document.getElementById('detailsGenres').textContent =
-            movie.genres.map(genre => genre.name).join(', ') || 'N/A';
+        // Get movie genres
+        const genreNames = [];
 
+        for (let genre of movie.genres) {
+            genreNames.push(genre.name);
+        }
+
+        document.getElementById('detailsGenres').textContent =
+            genreNames.join(', ') || 'N/A';
+
+        // Display release date
         document.getElementById('detailsRelease').textContent =
             movie.release_date || 'N/A';
 
-        document.getElementById('detailsRuntime').textContent =
-            movie.runtime
-                ? `${movie.runtime} minutes`
-                : 'N/A';
+        // Display runtime
+        if (movie.runtime) {
+            document.getElementById('detailsRuntime').textContent =
+                movie.runtime + ' minutes';
+        } else {
+            document.getElementById('detailsRuntime').textContent = 'N/A';
+        }
+
+        // Display rating
+        const rating = Number(movie.vote_average || 0).toFixed(1);
 
         document.getElementById('detailsRating').textContent =
-            `${Number(movie.vote_average || 0).toFixed(1)}/10`;
+            rating + '/10';
 
-        // Movie metadata
+        // Display short movie information
         const meta = document.getElementById('detailsMeta');
         meta.replaceChildren();
 
-        [
-            movie.release_date?.slice(0, 4) || 'N/A',
-            movie.genres[0]?.name || 'Unknown Genre',
-            movie.runtime ? `${movie.runtime} min` : 'N/A',
-            `${Number(movie.vote_average || 0).toFixed(1)}/10`
-        ].forEach(value => {
+        let releaseYear = 'N/A';
+        let firstGenre = 'Unknown Genre';
+        let shortRuntime = 'N/A';
+
+        if (movie.release_date) {
+            releaseYear = movie.release_date.slice(0, 4);
+        }
+
+        if (movie.genres.length > 0) {
+            firstGenre = movie.genres[0].name;
+        }
+
+        if (movie.runtime) {
+            shortRuntime = movie.runtime + ' min';
+        }
+
+        const metaValues = [
+            releaseYear,
+            firstGenre,
+            shortRuntime,
+            rating + '/10'
+        ];
+
+        for (let value of metaValues) {
             const span = document.createElement('span');
             span.textContent = value;
             meta.appendChild(span);
-        });
+        }
 
-        // Poster
+        // Display movie poster
         const poster = document.getElementById('detailsPoster');
 
         if (movie.poster_path) {
-            poster.src =
-                `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-            poster.alt = `${movie.title} poster`;
+            poster.src = 'https://image.tmdb.org/t/p/w500' + movie.poster_path;
+            poster.alt = movie.title + ' poster';
         } else {
             poster.style.display = 'none';
         }
 
-        // Backdrop
+        // Display movie backdrop
         if (movie.backdrop_path) {
-            document.getElementById('detailsHero')
-                .style.backgroundImage =
-                `linear-gradient(90deg, #09090f 5%, rgba(9,9,15,.88) 45%, rgba(9,9,15,.45) 100%), url("https://image.tmdb.org/t/p/original${movie.backdrop_path}")`;
+            const hero = document.getElementById('detailsHero');
+
+            hero.style.backgroundImage =
+                'linear-gradient(90deg, #09090f 5%, rgba(9,9,15,.88) 45%, rgba(9,9,15,.45) 100%), ' +
+                'url("https://image.tmdb.org/t/p/original' + movie.backdrop_path + '")';
         }
 
-        // Cast
-        const castContainer =
-            document.getElementById('detailsCast');
-
+       // Display movie cast
+        const castContainer = document.getElementById('detailsCast');
         castContainer.replaceChildren();
 
         const cast = movie.cast || [];
+        console.log('Total cast received:', cast.length);
 
         if (cast.length === 0) {
-            castContainer.textContent =
-                'Cast information is unavailable.';
+            castContainer.textContent = 'Cast information is unavailable.';
         }
 
-        cast.slice(0, 6).forEach(person => {
+        // Show a maximum of 6 cast members
+        let castCount = 0;
+
+        for (let person of cast) {
+            if (castCount >= 6) {
+                break;
+            }
+
             const card = document.createElement('div');
             card.className = 'cast-card';
 
+            // Cast profile picture
             if (person.profile_path) {
                 const image = document.createElement('img');
-                image.src =
-                    `https://image.tmdb.org/t/p/w185${person.profile_path}`;
+                image.src = 'https://image.tmdb.org/t/p/w185' + person.profile_path;
                 image.alt = person.name;
                 card.appendChild(image);
             }
 
+            // Cast name
             const name = document.createElement('strong');
             name.textContent = person.name;
 
+            // Character name
             const character = document.createElement('p');
-            character.textContent =
-                person.character || 'Cast member';
+            character.textContent = person.character || 'Cast member';
 
             card.appendChild(name);
             card.appendChild(character);
             castContainer.appendChild(card);
-        });
 
+            castCount++;
+        }
+
+        // Show details after loading
         loadingMessage.hidden = true;
         detailsContent.hidden = false;
 
@@ -127,58 +164,98 @@ async function loadMovieDetails() {
     }
 }
 
-// Add selected movie to watchlist
-document.getElementById('detailsAddBtn')
-    .addEventListener('click', () => {
-        if (!currentMovie) return;
+// ADD MOVIES TO WATCHLIST
+function addMovieToWatchlist() {
 
-        try {
-            const watchlist = JSON.parse(
-                localStorage.getItem('mymovie_watchlist') || '[]'
-            );
+    if (currentMovie === null) {
+        return;
+    }
 
-            if (watchlist.some(item => item.id === currentMovie.id)) {
-                alert('This movie is already in your watchlist!');
-                return;
+    try {
+        // Get saved movies
+        const watchlist = JSON.parse(
+            localStorage.getItem('mymovie_watchlist') || '[]'
+        );
+
+        // Check for duplicate movie
+        let exists = false;
+
+        for (let movie of watchlist) {
+            if (movie.id === currentMovie.id) {
+                exists = true;
+                break;
             }
-
-            const runtime = Number(currentMovie.runtime);
-
-            if (!Number.isInteger(runtime) || runtime <= 0) {
-                alert('Runtime is unavailable for this movie.');
-                return;
-            }
-
-            watchlist.push({
-                id: currentMovie.id,
-                title: currentMovie.title,
-                poster: currentMovie.poster_path,
-                releaseDate: currentMovie.release_date,
-                rating: currentMovie.vote_average,
-                overview: currentMovie.overview,
-                genreIds: currentMovie.genres.map(genre => genre.id),
-                genre: currentMovie.genres[0]?.name || '',
-                runtime,
-                status: 'Plan to Watch'
-            });
-
-            localStorage.setItem(
-                'mymovie_watchlist',
-                JSON.stringify(watchlist)
-            );
-
-            alert(`${currentMovie.title} added to your watchlist!`);
-
-        } catch (error) {
-            console.error(error);
-            alert('Unable to save movie.');
         }
-    });
 
-// Return to Discover Movies
-document.getElementById('detailsBackBtn')
-    .addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
+        if (exists) {
+            alert('This movie is already in your watchlist!');
+            return;
+        }
 
+        // Check movie runtime
+        const runtime = Number(currentMovie.runtime);
+
+        if (!Number.isInteger(runtime) || runtime <= 0) {
+            alert('Runtime is unavailable for this movie.');
+            return;
+        }
+
+        // Get genre IDs
+        const genreIds = [];
+
+        for (let genre of currentMovie.genres) {
+            genreIds.push(genre.id);
+        }
+
+        let firstGenre = '';
+
+        if (currentMovie.genres.length > 0) {
+            firstGenre = currentMovie.genres[0].name;
+        }
+
+        // Create movie object
+        const savedMovie = {
+            id: currentMovie.id,
+            title: currentMovie.title,
+            poster: currentMovie.poster_path,
+            releaseDate: currentMovie.release_date,
+            rating: currentMovie.vote_average,
+            overview: currentMovie.overview,
+            genreIds: genreIds,
+            genre: firstGenre,
+            runtime: runtime,
+            status: 'Plan to Watch'
+        };
+
+        // Save movie to localStorage
+        watchlist.push(savedMovie);
+
+        localStorage.setItem(
+            'mymovie_watchlist',
+            JSON.stringify(watchlist)
+        );
+
+        alert(currentMovie.title + ' added to your watchlist!');
+
+    } catch (error) {
+        console.error('Unable to save movie:', error);
+        alert('Unable to save movie.');
+    }
+}
+
+// Add to Watchlist button
+const addBtn = document.getElementById('detailsAddBtn');
+
+addBtn.addEventListener('click', function () {
+    addMovieToWatchlist();
+});
+
+// Back to Discover button
+const backBtn = document.getElementById('detailsBackBtn');
+
+backBtn.addEventListener('click', function () {
+    window.location.href = 'index.html';
+});
+
+// Load movie details when page opens
 loadMovieDetails();

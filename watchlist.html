@@ -1,21 +1,23 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>MyMovie - My Watchlist</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
+    <!-- NAV BAR -->
     <header class="navbar">
         <div class="logo">MY<span>MOVIE</span></div>
 
         <nav>
             <a href="index.html">Home</a>
-            <a href="watchlist.html" class="active">My Watchlist</a>
-            <a href="analytics.html">Analytics</a>
+            <a href="watchlist.html" class="active">Watchlist</a>
         </nav>
 
         <div class="nav-label">Your Movie Planner</div>
@@ -23,19 +25,74 @@
 
 
     <main class="watchlist-main">
+
+        <!-- WATCHLIST STATS-->
+        <section class="watchlist-panel watchlist-summary">
+            <h2>Watchlist Overview</h2>
+
+            <div class="watchlist-stats-grid">
+
+                <!-- TOTAL SAVES MOVIES -->
+                <div class="watchlist-stat">
+                    <h3>Total Movies</h3>
+                    <p id="totalMovies">0</p>
+                </div>
+
+                <!-- TOTAL WATCHED MOVIES-->
+                <div class="watchlist-stat">
+                    <h3>Movies Watched</h3>
+                    <p id="watchedMovies">0</p>
+                </div>
+
+                <!-- TOTAL PLANNED MOVIE-->
+                <div class="watchlist-stat">
+                    <h3>Plan to Watch</h3>
+                    <p id="plannedMovies">0</p>
+                </div>
+
+                <!-- Total movie runtime -->
+                <div class="watchlist-stat">
+                    <h3>Total Runtime</h3>
+                    <p id="totalWatchTime">0h 0m</p>
+                </div>
+
+            </div>
+
+            <!-- WATCH PROGRESS -->
+            <div class="watchlist-progress">
+                <h3>Watch Progress</h3>
+
+                <p id="watchProgressText">
+                    0 of 0 movies watched
+                </p>
+
+                <div class="watchlist-progress-track">
+                    <div
+                        id="watchProgressBar"
+                        class="watchlist-progress-fill">
+                    </div>
+                </div>
+
+                <p id="watchProgressPercent">0%</p>
+            </div>
+        </section>
+
+
+        <!-- ADD OR EDIT -->
         <section class="watchlist-panel">
             <h2>My Watchlist</h2>
             <p>Manage your favourite movies.</p>
 
             <form id="movieForm">
 
+                <!-- MOVIE TITLE-->
                 <label for="movieTitle">Movie Title:</label>
                 <input
                     type="text"
                     id="movieTitle"
                     required
                 >
-
+                <!-- MOVIE GENRE-->
                 <label for="movieGenre">Genre:</label>
                 <select id="movieGenre" required>
                     <option value="">Select Genre</option>
@@ -48,6 +105,7 @@
                     <option value="Animation">Animation</option>
                 </select>
 
+                <!-- MOVIE RUNTIME-->
                 <label for="movieRuntime">
                     Runtime (minutes):
                 </label>
@@ -58,6 +116,7 @@
                     required
                 >
 
+                <!-- MOVIE STATUS -->
                 <label for="movieStatus">Status:</label>
                 <select id="movieStatus">
                     <option value="Plan to Watch">
@@ -68,6 +127,7 @@
                     </option>
                 </select>
 
+                <!-- SAVE BUTTON-->
                 <button type="submit" id="saveMovieBtn">
                     Save Movie
                 </button>
@@ -75,6 +135,7 @@
             </form>
         </section>
 
+        <!-- DISPLAY WATCHED MOVIE -->
         <section class="watchlist-panel">
             <h2>Saved Movies</h2>
 
@@ -83,24 +144,14 @@
             </div>
         </section>
 
-        <section class="watchlist-panel">
-            <h2>Watchlist Statistics</h2>
-
-            <p>
-                Total Movies:
-                <span id="totalMovies">0</span>
-            </p>
-
-            <p>
-                Total Watch Time:
-                <span id="totalWatchTime">0 hours</span>
-            </p>
-        </section>
     </main>
 
+    <!-- FOOTER -->
     <footer>
         <p>MyMovie Desktop Application</p>
     </footer>
+
+    <!-- WACTHLIST JS -->
     <script src="watchlist.js"></script>
 
 </body>

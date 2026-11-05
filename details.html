@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,92 +7,106 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+    <!-- NAV BAR -->
     <header class="navbar">
         <div class="logo">MY<span>MOVIE</span></div>
-
         <nav>
             <a href="index.html">Home</a>
             <a href="watchlist.html">Watchlist</a>
-            <a href="analytics.html">Analytics</a>
         </nav>
-
         <div class="nav-label">Your Movie Planner</div>
     </header>
-
     <main class="details-main">
-
+        <!-- Show message while loading movie details -->
         <div id="detailsLoading" class="details-message">
             Loading movie details...
         </div>
 
+        <!-- MOVIE DETAILS CONTENT -->
         <section id="detailsContent" hidden>
-
+            <!-- MOVIE BANNER-->
             <div id="detailsHero" class="details-hero">
                 <div class="details-hero-content">
                     <span class="hero-tag">MOVIE DETAILS</span>
-
+                    <!-- MOVIE TITLE-->
                     <h1 id="detailsTitle">Movie Title</h1>
 
+                    <!-- MOVIE INFO-->
                     <div id="detailsMeta" class="details-meta"></div>
 
+                    <!-- MOVIE DESCRIPTION-->
                     <p id="detailsOverview"></p>
 
+                    <!--MOVIE ACTIONS BUTTON-->
                     <div class="details-actions">
-                        <button id="detailsAddBtn">
+                        <button id="detailsAddBtn" type="button">
                             + Add to Watchlist
                         </button>
-
                         <button id="detailsBackBtn" type="button">
                             Back to Discover
                         </button>
                     </div>
                 </div>
             </div>
-
+            <!-- MOVIE INFORMATION DETAILS -->
             <div class="details-information">
 
+                <!--MOVIE POSTER -->
                 <div class="details-poster-container">
                     <img id="detailsPoster" alt="Movie poster">
                 </div>
 
+
+                <!-- MOVIE INFORMATION PANEL -->
                 <div class="details-info-panel">
+
                     <h2>About This Movie</h2>
 
-                    <p><strong>Director:</strong>
+                    <!-- DIRECTOR -->
+                    <p>
+                        <strong>Director:</strong>
                         <span id="detailsDirector">N/A</span>
                     </p>
 
-                    <p><strong>Genres:</strong>
+                    <!-- GENRES -->
+                    <p>
+                        <strong>Genres:</strong>
                         <span id="detailsGenres">N/A</span>
                     </p>
 
-                    <p><strong>Release Date:</strong>
+                    <!-- RELEASE DATE -->
+                    <p>
+                        <strong>Release Date:</strong>
                         <span id="detailsRelease">N/A</span>
                     </p>
 
-                    <p><strong>Runtime:</strong>
+                    <!-- RUNTIME -->
+                    <p>
+                        <strong>Runtime:</strong>
                         <span id="detailsRuntime">N/A</span>
                     </p>
 
-                    <p><strong>Rating:</strong>
+                    <!-- RATING -->
+                    <p>
+                        <strong>Rating:</strong>
                         <span id="detailsRating">N/A</span>
                     </p>
 
+                    <!-- DISPLAY MOVIE CAST -->
                     <h2>Top Cast</h2>
                     <div id="detailsCast" class="details-cast"></div>
                 </div>
-
             </div>
-
         </section>
-
     </main>
 
+    <!-- FOOTER-->
     <footer>
         <p>© 2026 MyMovie | Your Personal Movie Planner</p>
     </footer>
 
+    <!-- MOVIE DETAILS PAGE JS -->
     <script src="details.js"></script>
+
 </body>
 </html>

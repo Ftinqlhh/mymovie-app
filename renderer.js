@@ -1,32 +1,29 @@
+
 const searchInput = document.getElementById('searchMovie');
 const searchBtn = document.getElementById('searchBtn');
 const movieResults = document.getElementById('movieResults');
 
-// Search movies from TMDB
+const genreSelect = document.getElementById('genreSelect');
+const recommendBtn = document.getElementById('recommendBtn');
+
+// Search movies by title
 async function searchMovies() {
     const title = searchInput.value.trim();
 
-    // Input validation
     if (title === '') {
-        movieResults.innerHTML =
-            '<p class="empty-message">Please enter a movie title.</p>';
+        movieResults.innerHTML = '<p class="empty-message">Please enter a movie title.</p>';
         return;
     }
 
-    // Loading message
-    movieResults.innerHTML =
-        '<p class="empty-message">Searching for movies...</p>';
-
+    movieResults.innerHTML = '<p class="empty-message">Searching for movies...</p>';
     searchBtn.disabled = true;
 
     try {
-        // Request data through Electron preload
+        // Get search results from TMDB
         const movies = await window.movieAPI.searchMovies(title);
 
-        // No results found
         if (movies.length === 0) {
-            movieResults.innerHTML =
-                '<p class="empty-message">No movies found. Try another title.</p>';
+            movieResults.innerHTML = '<p class="empty-message">No movies found. Try another title.</p>';
             return;
         }
 
@@ -34,102 +31,93 @@ async function searchMovies() {
 
     } catch (error) {
         console.error('Movie search error:', error);
-
-        movieResults.innerHTML =
-            '<p class="empty-message">Unable to load movies. Please check your internet connection or API configuration.</p>';
+        movieResults.innerHTML = '<p class="empty-message">Unable to load movies. Please check your internet connection or API configuration.</p>';
 
     } finally {
         searchBtn.disabled = false;
     }
 }
 
+
 // Display movie cards
 function displayMovies(movies) {
     movieResults.replaceChildren();
 
-    movies.forEach(movie => {
+    for (let movie of movies) {
         const card = document.createElement('div');
         card.className = 'movie-card';
 
-        const poster = document.createElement('img');
-
-        poster.src = movie.poster_path
-            ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-            : '';
-
-        poster.alt = movie.title || 'Movie poster';
-
-        if (!movie.poster_path) {
-            poster.style.display = 'none';
+        // Movie poster
+        if (movie.poster_path) {
+            const poster = document.createElement('img');
+            poster.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+            poster.alt = movie.title || 'Movie poster';
+            card.appendChild(poster);
         }
 
+        // Movie title
         const title = document.createElement('h3');
         title.textContent = movie.title || 'Unknown Title';
 
+        // Release date
         const release = document.createElement('p');
-        release.textContent =
-            `Release Date: ${movie.release_date || 'N/A'}`;
+        release.textContent = 'Release Date: ' + (movie.release_date || 'N/A');
 
+        // Movie rating
         const rating = document.createElement('p');
-        rating.textContent =
-            `Rating: ${Number(movie.vote_average || 0).toFixed(1)}/10`;
+        rating.textContent = 'Rating: ' + Number(movie.vote_average || 0).toFixed(1) + '/10';
 
+        // Movie synopsis
         const overview = document.createElement('p');
-        overview.textContent =
-            movie.overview || 'No synopsis available.';
-            overview.className = 'movie-overview';
+        overview.textContent = movie.overview || 'No synopsis available.';
+        overview.className = 'movie-overview';
 
-        card.appendChild(poster);
         card.appendChild(title);
         card.appendChild(release);
         card.appendChild(rating);
         card.appendChild(overview);
+
         // Add to Watchlist button
         const addBtn = document.createElement('button');
         addBtn.textContent = '+ Add to Watchlist';
 
-        addBtn.addEventListener('click', () => {
+        addBtn.addEventListener('click', function () {
             addToWatchlist(movie);
         });
 
-        
         card.appendChild(addBtn);
 
-        // View full movie information
+        // View Details button
         const detailsBtn = document.createElement('button');
         detailsBtn.textContent = 'View Details';
         detailsBtn.className = 'view-details-btn';
 
-        detailsBtn.addEventListener('click', () => {
-            window.location.href = `details.html?id=${movie.id}`;
+        detailsBtn.addEventListener('click', function () {
+            window.location.href = 'details.html?id=' + movie.id;
         });
 
         card.appendChild(detailsBtn);
-
         movieResults.appendChild(card);
-
-    });
+    }
 }
 
-// Search button event
+// Search when button is clicked
 searchBtn.addEventListener('click', searchMovies);
 
-// Press Enter to search
-searchInput.addEventListener('keydown', event => {
+// Search when Enter is pressed
+searchInput.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
+        event.preventDefault();
         searchMovies();
     }
 });
 
-const genreSelect = document.getElementById('genreSelect');
-const recommendBtn = document.getElementById('recommendBtn');
-
+// Recommend movies based on selected genre
 async function recommendMovies() {
     const selectedGenre = genreSelect.value;
+    let genreId = '';
 
-    // Student-written decision-making logic
-    let genreId;
-
+    // Check selected genre
     if (selectedGenre === '28') {
         genreId = '28'; // Action
     } else if (selectedGenre === '35') {
@@ -144,139 +132,129 @@ async function recommendMovies() {
         genreId = '878'; // Science Fiction
     } else if (selectedGenre === '16') {
         genreId = '16'; // Animation
-    } else {
-        genreId = ''; // All Genres fallback
     }
 
-    movieResults.innerHTML =
-        '<p class="empty-message">Finding movies for you...</p>';
-
+    movieResults.innerHTML = '<p class="empty-message">Finding movies for you...</p>';
     recommendBtn.disabled = true;
 
     try {
-        const movies =
-            await window.movieAPI.discoverMovies(genreId);
+        const movies = await window.movieAPI.discoverMovies(genreId);
 
         if (movies.length === 0) {
-            movieResults.innerHTML =
-                '<p class="empty-message">No recommendations found. Try another genre.</p>';
+            movieResults.innerHTML = '<p class="empty-message">No recommendations found. Try another genre.</p>';
             return;
         }
 
-        
         let minimumRating;
         let genreName;
 
+        // Set minimum rating for each genre
         switch (selectedGenre) {
             case '28':
                 minimumRating = 6.5;
                 genreName = 'Action';
-            break;
+                break;
 
             case '35':
                 minimumRating = 6.0;
                 genreName = 'Comedy';
-            break;
+                break;
 
             case '18':
                 minimumRating = 7.0;
                 genreName = 'Drama';
-            break;
+                break;
 
             case '27':
                 minimumRating = 5.5;
                 genreName = 'Horror';
-            break;
+                break;
 
             case '10749':
                 minimumRating = 6.5;
                 genreName = 'Romance';
-            break;
+                break;
 
             case '878':
                 minimumRating = 6.5;
                 genreName = 'Science Fiction';
-            break;
+                break;
 
             case '16':
                 minimumRating = 6.5;
                 genreName = 'Animation';
-            break;
+                break;
 
-        default:
-            minimumRating = 6.0;
-            genreName = 'All Genres';
-    }
+            default:
+                minimumRating = 6.0;
+                genreName = 'All Genres';
+        }
 
-    // Apply student-written recommendation criteria
-    const recommendedMovies = movies
-    .filter(movie =>
-        Number(movie.vote_average) >= minimumRating
-    )
-    .sort((a, b) =>
-        Number(b.vote_average) - Number(a.vote_average)
-    );
+        // Filter movies by minimum rating
+        const recommendedMovies = [];
 
-    // Fallback when no movies meet the rating criteria
-    
-    if (recommendedMovies.length === 0) {
-        // Display fallback movies
-        displayMovies(movies);
+        for (let movie of movies) {
+            if (Number(movie.vote_average) >= minimumRating) {
+                recommendedMovies.push(movie);
+            }
+        }
 
-        // Show fallback message above the movie cards
-        const fallbackMessage = document.createElement('p');
+        // Sort movies from highest to lowest rating
+        recommendedMovies.sort(function (a, b) {
+            return Number(b.vote_average) - Number(a.vote_average);
+        });
 
-        fallbackMessage.className = 'empty-message';
+        if (recommendedMovies.length === 0) {
+            displayMovies(movies);
 
-        fallbackMessage.textContent =
-            `No ${genreName} movies met the minimum rating ` +
-            `of ${minimumRating}/10. Showing available movies instead.`;
+            const message = document.createElement('p');
+            message.className = 'empty-message';
+            message.textContent =
+                'No ' + genreName + ' movies met the minimum rating of ' +
+                minimumRating + '/10. Showing available movies instead.';
 
-        movieResults.prepend(fallbackMessage);
-
-    } else {
-        // Display movies that meet the rating criteria
-        displayMovies(recommendedMovies);
-    }
+            movieResults.prepend(message);
+        } else {
+            displayMovies(recommendedMovies);
+        }
 
     } catch (error) {
         console.error('Recommendation error:', error);
-
-        movieResults.innerHTML =
-            '<p class="empty-message">Unable to load recommendations. Please try again.</p>';
+        movieResults.innerHTML = '<p class="empty-message">Unable to load recommendations. Please try again.</p>';
 
     } finally {
         recommendBtn.disabled = false;
     }
 }
 
+
+// Recommend when button is clicked
 recommendBtn.addEventListener('click', recommendMovies);
 
-// Save selected movie to Local Storage
-
+// Add selected movie to Watchlist
 async function addToWatchlist(movie) {
     try {
         const watchlist = JSON.parse(
             localStorage.getItem('mymovie_watchlist') || '[]'
         );
 
-        // Check for duplicate movie
-        const exists = watchlist.some(
-            item => item.id === movie.id
-        );
+        // Check if movie is already saved
+        let exists = false;
+
+        for (let item of watchlist) {
+            if (item.id === movie.id) {
+                exists = true;
+                break;
+            }
+        }
 
         if (exists) {
             alert('This movie is already in your watchlist!');
             return;
         }
 
-        // Get actual runtime from TMDB
-        const details = await window.movieAPI.getMovieDetails(
-            movie.id
-        );
-
-        console.log('TMDB Movie Details:', details);
-
+        // Get movie runtime from TMDB
+        const details = await window.movieAPI.getMovieDetails(movie.id);
         const runtime = Number(details.runtime);
 
         if (!Number.isInteger(runtime) || runtime <= 0) {
@@ -284,6 +262,7 @@ async function addToWatchlist(movie) {
             return;
         }
 
+        // Save movie information
         const savedMovie = {
             id: movie.id,
             title: movie.title,
@@ -304,12 +283,31 @@ async function addToWatchlist(movie) {
             JSON.stringify(watchlist)
         );
 
-        alert(
-            `${movie.title} added successfully!\nRuntime: ${runtime} minutes`
-        );
+        alert(movie.title + ' added successfully!\nRuntime: ' + runtime + ' minutes');
 
     } catch (error) {
         console.error('Add to Watchlist Error:', error);
         alert('Unable to retrieve movie runtime.');
     }
 }
+
+// Load popular movies when the page opens
+async function loadFeaturedMovies() {
+    movieResults.innerHTML = '<p class="empty-message">Loading movies for you...</p>';
+
+    try {
+        const movies = await window.movieAPI.discoverMovies('');
+
+        if (movies.length === 0) {
+            movieResults.innerHTML = '<p class="empty-message">No movies available right now.</p>';
+            return;
+        }
+
+        displayMovies(movies);
+    } catch (error) {
+        console.error('Featured movies error:', error);
+        movieResults.innerHTML = '<p class="empty-message">Unable to load movies. Please check your internet connection.</p>';
+    }
+}
+// Show movies automatically
+loadFeaturedMovies();
