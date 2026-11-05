@@ -311,3 +311,10 @@ async function loadFeaturedMovies() {
 }
 // Show movies automatically
 loadFeaturedMovies();
+
+//Clear Button
+const clearBtn = document.getElementById('clearBtn');
+clearBtn.addEventListener('click',function(){
+    //Clear search
+    document.getElementById('searchMovie').value='';
+});
