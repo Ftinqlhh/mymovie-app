@@ -1,9 +1,7 @@
-
 require('dotenv').config();
 
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-
 
 // Create the main application window
 function createWindow() {
@@ -23,7 +21,6 @@ function createWindow() {
     mainWindow.loadFile('index.html');
 }
 
-
 // Get TMDB token from .env file
 function getToken() {
     const token = process.env.TMDB_TOKEN;
@@ -31,10 +28,8 @@ function getToken() {
     if (!token) {
         throw new Error('TMDB token is missing.');
     }
-
     return token;
 }
-
 
 // Request movie data from TMDB
 async function getTMDBData(url) {
@@ -55,7 +50,6 @@ async function getTMDBData(url) {
     return data;
 }
 
-
 // Search movies by title
 async function searchMovies(event, title) {
 
@@ -75,7 +69,6 @@ async function searchMovies(event, title) {
 
     return data.results || [];
 }
-
 
 // Discover movies based on genre
 async function discoverMovies(event, genreId) {

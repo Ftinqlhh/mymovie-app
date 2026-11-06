@@ -1,4 +1,3 @@
-
 const STORAGE_KEY = 'mymovie_watchlist';
 
 // Get elements from HTML
@@ -11,7 +10,7 @@ const saveMovieBtn = document.getElementById('saveMovieBtn');
 
 const watchlistContainer = document.getElementById('watchlistContainer');
 
-// Statistics
+// STATISTICS
 const totalMovies = document.getElementById('totalMovies');
 const watchedMovies = document.getElementById('watchedMovies');
 const plannedMovies = document.getElementById('plannedMovies');
@@ -21,9 +20,8 @@ const watchProgressBar = document.getElementById('watchProgressBar');
 const watchProgressPercent = document.getElementById('watchProgressPercent');
 
 let editingId = null;
-
-
-// Get movies from localStorage
+//CRUD : CREATE
+// GET MOVIE FROM LOCALSTORAGE
 function getWatchlist() {
     try {
         const movies = JSON.parse(
@@ -41,13 +39,12 @@ function getWatchlist() {
     }
 }
 
-
 // Save movies to localStorage
 function saveWatchlist(movies) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(movies));
 }
 
-
+//CRUD : READ
 // Show saved movies on the page
 function displayWatchlist() {
     const movies = getWatchlist();
@@ -118,7 +115,7 @@ function displayWatchlist() {
     updateStatistics(movies);
 }
 
-
+//CRUD : CREATE
 // Add or update a movie
 movieForm.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -198,7 +195,7 @@ movieForm.addEventListener('submit', function (event) {
 });
 
 
-// Edit a saved movie
+// CRUD : UPDATE, Edit a saved movie
 function editMovie(id) {
     const movies = getWatchlist();
     let selectedMovie = null;
@@ -231,7 +228,7 @@ function editMovie(id) {
 }
 
 
-// Delete a movie
+// CRUD : DELETE, Delete a movie
 function deleteMovie(id) {
     if (!confirm('Delete this movie from your watchlist?')) {
         return;
